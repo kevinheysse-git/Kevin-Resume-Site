@@ -388,7 +388,7 @@
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
 
-        fetch(`/nba/player/${playerId}/shots/${gameId}/`)
+        fetch(`/nba_player_dashboard/player/${playerId}/shots/${gameId}/`)
             .then(res => res.json())
             .then(data => {
                 if (data.error) {
