@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Kevin Heysse | Analytics Engineer{% endblock %}
+{% block content %}
+
+<section class="hero py-5">
+  <div class="container">
+    <div class="row align-items-center justify-content-between">
+
+      <div class="col-md-3 profile-card text-light p-4 rounded-4 ms-5">
+        <div class="text-center mb-3">
+          <div class="profile-pic-glow-new">
+            <img src="{% static 'personal_site/images/kevin-headshot-linkedin.jpg' %}" alt="Kevin Heysse">
+          </div>
+        </div>
+        <h4 class="fw-bold text-center jetbrains-font">Kevin Heysse</h4>
+        <p class="text-center text-teal jetbrains-font">Analytics Engineer</p>
+        <ul class="list-unstyled jetbrains-profilecard contact-list"
+            style="letter-spacing: 0.3px;">
+            <li><i class="bi bi-envelope"></i> Kevinheysse@gmail.com</li>
+            <li><i class="bi bi-geo-alt"></i> Minneapolis, MN</li>
+            <li><i class="bi bi-briefcase"></i> Full‑time</li>
+            <li><i class="bi bi-link-45deg"></i> Kevinheysse.dev</li>
+        </ul>
+        <div class="d-flex flex-wrap justify-content-center gap-2 my-3">
+          <span class="badge bg-dark border border-teal text-teal poppins-font">Python</span>
+          <span class="badge bg-dark border border-teal text-teal poppins-font">Django</span>
+          <span class="badge bg-dark border border-teal text-teal poppins-font">SQL</span>
+          <span class="badge bg-dark border border-teal text-teal poppins-font">BigQuery</span>
+        </div>
+        <a href="{% static 'personal_site/resume/Kevin_Heysse_Resume_04292026.pdf' %}" 
+        class="btn btn-outline-light w-100 poppins-font" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;color:#00bfa6; font-weight:600;letter-spacing: 0.7px;">
+        Download CV
+        <i class="bi bi-download" style="color:#00bfa6;font-size:1.2rem;transition:color 0.3s ease,transform 0.3s ease;"></i>
+        </a>
+      </div>
+
+      <div class="col-md-5 custom-width text-light">
+        <h1 class="intro-line">Hey</h1>
+        <h1 class="intro-line">I’m <span class="text-teal">Kevin</span>,</h1>
+        <h1 class="intro-line">Analytics Engineer</h1>
+        <p class="mt-4 mb-3 text-light jetbrains-text left-text"
+           style="letter-spacing: 0.4px; font-size: 0.95rem;">
+          I help businesses grow by crafting scalable data solutions and creative projects that merge technology with insight.
+        </p>
+        <div class="social-icons mt-4">
+            <a href="https://github.com/kevinheysse-git" class="icon-link" target="_blank">
+                <i class="bi bi-github"></i>
+            </a>
+            <a href="https://www.linkedin.com/in/kevinheysse/" class="icon-link" target="_blank">
+                <i class="bi bi-linkedin"></i>
+            </a>
+            <a href="mailto:kevinheysse@gmail.com" class="icon-link">
+                <i class="bi bi-envelope-fill"></i>
+            </a>
+        </div>
+      </div>
+
+      <div class="col-md-2 stats-card text-light p-4 rounded-4 me-5">
+        <div class="stat-row">
+            <span class="stat-number">2</span>
+            <span class="stat-label">Programming Languages</span>
+        </div>
+
+        <div class="stat-row">
+            <span class="stat-number">6</span>
+            <span class="stat-label">Development Tools</span>
+        </div>
+
+        <div class="stat-row">
+            <span class="stat-number">10</span>
+            <span class="stat-label">Years of Experience</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="about py-5 py-md-6">
+  <div class="container">
+    <div class="row align-items-center g-lg-5 g-xl-6 justify-content-center">
+      <div class="col-lg-7 mb-5">
+        <div class="about-header mb-4">
+          <h1 class="fw-bold poppins-font text-light">About Me</h1>
+        </div>
+        <div class="about-card p-4 rounded-4">
+          <h2 class="text-teal fw-bold mb-3">Hello!</h2>
+          <p class="jetbrains-font text-light mb-3">
+            I’m Kevin — an analytics engineer specializing in
+            <span class="text-teal">Python</span>, 
+            <span class="text-teal">Django</span>, 
+            <span class="text-teal">Dagster</span>, and 
+            <span class="text-teal">BigQuery</span>.
+          </p>
+          <p class="jetbrains-font text-light mb-3">
+            As a detail‑oriented engineer, I focus on building automated tools and designing analytics suites — solving complex problems and refining my craft along the way.
+          </p>
+          <p class="jetbrains-font text-light mb-3">
+            Outside of coding, I explore emerging technologies, enjoy gaming, and create data‑driven projects 
+            particularly combining my passions in <span class="text-teal">sports analytics</span>.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-5 text-center">
+        <img src="{% static 'personal_site/images/teal-setup.png' %}" 
+             alt="Desk Setup" 
+             class="img-fluid rounded-4 shadow-lg">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="expertise py-8">
+  <div class="container">
+    <h2 class="expertise-header">Expertise</h2>
+    <div class="row mb-3">
+      <div class="col-12 col-md-6">
+        <button id="technical-btn" class="expertise-btn active">
+          Technical Competencies
+        </button>
+        <button id="soft-btn" class="expertise-btn">
+          Interpersonal Strengths
+        </button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div id="skills-grid" class="row g-3">
+    </div>
+  </div>
+</section>
+
+<section class="experience-gateway-section py-8">
+  <div class="container">
+    <h2 class="experience-header">Experience</h2>
+    <h3 class="fw-bold text-teal mb-3">I have worked with some awesome companies!</h3>
+    <div class="divider"></div>
+    <p class="jetbrains-text mb-4">
+      Explore my professional experience and the work that allowed me to hone my skillset.
+    </p>
+    <ul class="experience-list mb-4">
+    <li><strong>Analytics Engineer</strong> @ Prime Therapeutics <span class="text-muted-light">(Current)</span></li>
+    <li><strong>Senior Forecast Analyst</strong> @ Prime Therapeutics <span class="text-muted-light">(5 years)</span></li>
+    <li><strong>Business Analysis Coordinator</strong> @ Optum <span class="text-muted-light">(4 years)</span></li>
+    </ul>
+    <a href="{% url 'experience' %}" class="btn btn-outline-teal px-4 py-2 mt-3 mb-4">
+      View Experience
+    </a>
+  </div>
+</section>
+
+<section class="projects-gateway-section py-8">
+  <div class="container">
+    <h2 class="projects-header">Projects</h2>
+    <h3 class="fw-bold text-teal mb-3">My work related projects are proprietary but please check out my passion projects!</h3>
+    <div class="divider"></div>
+    <p class="jetbrains-text mb-4">
+      Explore my sandbox of creativity and technical exploration, building projects that merge my passions with my skills.
+    </p>
+    <ul class="projects-list mb-4">
+    <li><strong>NBA Player Dashboard</strong> using Python <span class="text-muted-light">(current project)</span></li>
+    <li><strong>Placeholder Project</strong> using XYZ <span class="text-muted-light">(build length)</span></li>
+    </ul>
+    <a href="{% url 'projects' %}" class="btn btn-outline-teal px-4 py-2 mt-3 mb-4">
+      View Projects
+    </a>
+  </div>
+</section>
+
+<script src="{% static 'personal_site/js/expertise_section.js' %}"></script>
+
+{% endblock %}

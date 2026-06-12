@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}NBA Player Search | Kevin Heysse{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        <h1 class="mb-1 fw-bold" style="color: #00e5cc;">
+            NBA Player <span style="color: white;">Performance Visualizer</span>
+        </h1>
+        <p class="mb-4" style="color: #aaa; font-family: 'JetBrains Mono', monospace;">
+            Search a player to see their stat trends across the 2025-26 season.
+        </p>
+
+        <form method="GET" action="{% url 'nba_visualizer:player_search' %}">
+            <div class="input-group mb-4">
+                <input
+                    type="text"
+                    name="q"
+                    class="form-control text-muted-light bg-dark border-secondary"
+                    placeholder="e.g. LeBron James..."
+                    value="{{ query|default:'' }}"
+                    autocomplete="off"
+                    style="font-family: 'JetBrains Mono', monospace;"
+                />
+                <button class="btn" type="submit"
+                    style="background-color: #00e5cc; color: #000; font-family: 'JetBrains Mono', monospace;">
+                    Search
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-3 mb-4 text-start animate-fade-in" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">
+            <span style="color: #989898; margin-right: 8px;">Trending Searches:</span>
+            <a href="#" onclick="executeQuickSearch('Anthony Edwards')" class="trending-tag">Anthony Edwards</a>
+            <a href="#" onclick="executeQuickSearch('LeBron James')" class="trending-tag">LeBron James</a>
+            <a href="#" onclick="executeQuickSearch('Luka Dončić')" class="trending-tag">Luka Dončić</a>
+            <a href="#" onclick="executeQuickSearch('Nikola Jokić')" class="trending-tag">Nikola Jokić</a>
+        </div>
+
+        {% if players %}
+            <div class="d-flex flex-column gap-2">
+                {% for player in players %}
+                    <a href="{% url 'nba_visualizer:player_stats' player.id %}"
+                        class="text-decoration-none p-3 rounded"
+                        style="background-color: #1a1a1a; border: 1px solid #2a2a2a; color: #fff;
+                               font-family: 'JetBrains Mono', monospace; transition: border-color 0.2s;"
+                        onmouseover="this.style.borderColor='#00e5cc'"
+                        onmouseout="this.style.borderColor='#2a2a2a'">
+                        {{ player.full_name }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% elif query %}
+            <p style="color: #aaa; font-family: 'JetBrains Mono', monospace;">
+                No players found for "{{ query }}"
+            </p>
+        {% endif %}
+
+        <div class="row g-3 mt-5 pt-4" style="border-top: 1px solid #2a2a2a; font-family: 'JetBrains Mono', monospace;">
+            <div class="col-12 mb-1">
+                <p style="color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; margin: 0;">
+                    // 2025-26 Season Performance Leaders
+                </p>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="p-3 rounded text-light leaderboard-card" style="background-color: #1a1a1a; border: 1px solid #2a2a2a;">
+                    <small style="color: #666; font-size: 0.7rem; text-transform: uppercase;">Points Per Game</small>
+                    <h5 class="mb-0 mt-1 fw-bold text-white">Luka Dončić</h5>
+                    <div class="d-flex justify-content-between align-items-center mt-2" style="font-size: 0.8rem;">
+                        <span style="color: #888;">DAL • PG</span>
+                        <strong style="color: #00e5cc;">33.9 PPG</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-3 rounded text-light leaderboard-card" style="background-color: #1a1a1a; border: 1px solid #2a2a2a;">
+                    <small style="color: #666; font-size: 0.7rem; text-transform: uppercase;">Assists Per Game</small>
+                    <h5 class="mb-0 mt-1 fw-bold text-white">Tyrese Haliburton</h5>
+                    <div class="d-flex justify-content-between align-items-center mt-2" style="font-size: 0.8rem;">
+                        <span style="color: #888;">IND • PG</span>
+                        <strong style="color: #00e5cc;">10.9 APG</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-3 rounded text-light leaderboard-card" style="background-color: #1a1a1a; border: 1px solid #2a2a2a;">
+                    <small style="color: #666; font-size: 0.7rem; text-transform: uppercase;">Player Efficiency Rating</small>
+                    <h5 class="mb-0 mt-1 fw-bold text-white">Nikola Jokić</h5>
+                    <div class="d-flex justify-content-between align-items-center mt-2" style="font-size: 0.8rem;">
+                        <span style="color: #888;">DEN • C</span>
+                        <strong style="color: #bb86fc;">31.0 PER</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function executeQuickSearch(playerName) {
+    event.preventDefault();
+    const searchInput = document.querySelector('input[type="text"]') || document.getElementById('search-input');
+    const searchForm = searchInput.closest('form');
+
+    if (searchInput && searchForm) {
+        searchInput.value = playerName;
+        searchForm.submit();
+    }
+}
+</script>
+{% endblock %}

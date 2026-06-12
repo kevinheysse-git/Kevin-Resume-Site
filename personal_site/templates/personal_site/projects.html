@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Projects | Kevin Heysse{% endblock %}
+
+{% block content %}
+<section class="projects-page">
+  <div class="container">
+        <h2 class="projects-page-header mb-5">Projects</h2>
+        <p style="color: #dbdbdb; font-family: 'JetBrains Mono', monospace; font-size: .95rem; mb-4">
+            Welcome to my projects page! Here you'll find a curated selection of my work, showcasing a blend of web applications and data analytics projects. 
+            Each project reflects my passion for creating insightful solutions and my commitment to continuous learning. 
+            Feel free to explore and reach out if you'd like to discuss any of the projects or potential collaborations!
+        </p>
+        <p style="color: rgba(0, 191, 166, 0.8); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; mb-4">
+            Note: Specific work related projects are proprietary and thus not included here, but I'm happy to discuss them in more detail upon request!
+        </p>
+
+        <div class="d-flex gap-2 mb-4 flex-wrap" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">
+            <button onclick="filterCategory('all', this)" class="proj-filter-btn active-filter">All Projects</button>
+            <button onclick="filterCategory('webapps', this)" class="proj-filter-btn">Web Applications</button>
+            <button onclick="filterCategory('analytics', this)" class="proj-filter-btn">Data Analytics</button>
+        </div>
+
+        <div class="d-flex flex-column gap-3" id="projectsContainer">
+            {% for project in projects %}
+            <div class="project-item w-100" data-category="{{ project.category }}">
+                <div class="card wide-project-card rounded p-4 text-light" style="background-color: #1a1a1a; border: 1px solid #2a2a2a;">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                        
+                        <div style="max-width: 750px;">
+                            <div class="d-flex flex-wrap align-items-center gap-3 mb-2">
+                                <h4 class="fw-bold m-0 text-white" style="letter-spacing: -0.5px;">{{ project.title }}</h4>
+                                
+                                <div class="d-flex flex-wrap gap-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;">
+                                    {% for tag in project.tags %}
+                                    <span style="background: rgba(255,255,255,0.03); color: #00e5cc; border: 1px solid rgba(0,229,204,0.12); padding: 1px 6px; border-radius: 4px;">
+                                        {{ tag }}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <p class="m-0" style="color: #aaa; font-size: 0.9rem; line-height: 1.5;">
+                                {{ project.description }}
+                            </p>
+                        </div>
+
+                        <div class="pt-2 pt-md-0 ms-md-auto" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; shrink: 0;">
+                            {% if project.live_url %}
+                            <a href="{{ project.live_url }}" class="btn btn-sm action-launch-btn px-3 py-2" style="border: 1px solid #00e5cc; color: #00e5cc; background: transparent; transition: all 0.2s ease;">
+                                Launch App →
+                            </a>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+    </div>
+</div>
+
+
+<script>
+    function filterCategory(cat, buttonEl) {
+        document.querySelectorAll('.proj-filter-btn').forEach(btn => btn.classList.remove('active-filter'));
+        buttonEl.classList.add('active-filter');
+
+        document.querySelectorAll('.project-item').forEach(item => {
+            if (cat === 'all' || item.getAttribute('data-category') === cat) {
+                item.style.setProperty('display', 'block', 'important');
+            } else {
+                item.style.setProperty('display', 'none', 'important');
+            }
+        });
+    }
+</script>
+
+{% endblock %}

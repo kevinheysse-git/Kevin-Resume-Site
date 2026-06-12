@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contact | Kevin Heysse{% endblock %}
+
+{% block content %}
+<section class="contact-page">
+  <div class="container">
+        <h2 class="contact-page-header mb-5">Contact</h2>
+        <p style="color: #aaa; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-top: 0.5rem;">
+                — active gateways for recruitment, technical consultation, and networking
+        </p>
+
+        <div class="row g-4">
+            <div class="col-md-6 d-flex flex-column gap-3">
+                
+                <div class="card contact-card p-4 rounded" style="background-color: #1a1a1a; border: 1px solid #2a2a2a;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <small style="color: #666; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">// Direct Line</small>
+                            <h4 class="fw-bold text-white mt-1 mb-0" style="font-size: 1.1rem;">Email Address</h4>
+                            <p class="m-0 mt-1" id="emailText" style="color: #aaa; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;">kevinheysse@gmail.com</p>
+                        </div>
+                        <button onclick="copyEmailToClipboard()" id="copyBtn" class="btn btn-sm" style="border: 1px solid #00e5cc; color: #00e5cc; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; background: transparent; transition: all 0.2s;">
+                            Copy
+                        </button>
+                    </div>
+                </div>
+
+                <a href="https://www.linkedin.com/in/kevinheysse" target="_blank" class="text-decoration-none card contact-card p-4 rounded" style="background-color: #1a1a1a; border: 1px solid #2a2a2a;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <small style="color: #666; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">// Professional Network</small>
+                            <h4 class="fw-bold text-white mt-1 mb-0" style="font-size: 1.1rem;">LinkedIn Profile</h4>
+                            <p class="m-0 mt-1" style="color: #00e5cc; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">linkedin.com/in/kevinheysse →</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://github.com/kevinheysse-git" target="_blank" class="text-decoration-none card contact-card p-4 rounded" style="background-color: #1a1a1a; border: 1px solid #2a2a2a;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <small style="color: #666; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">// Version Control</small>
+                            <h4 class="fw-bold text-white mt-1 mb-0" style="font-size: 1.1rem;">GitHub Ecosystem</h4>
+                            <p class="m-0 mt-1" style="color: #888; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">github.com/kevinheysse-git →</p>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+
+            <div class="col-md-6">
+                <div class="h-100 p-4 rounded d-flex flex-column justify-content-between" style="background: linear-gradient(135deg, #141414 0%, #111 100%); border: 1px solid #1a1a1a; font-family: 'JetBrains Mono', monospace;">
+                    <div>
+                        <h6 style="color: #00e5cc; font-size: 0.85rem;" class="mb-3 fw-bold">// RECRUITER BRIEFING</h6>
+                        
+                        <ul class="list-unstyled d-flex flex-column gap-3" style="font-size: 0.85rem; color: #aaa; line-height: 1.6;">
+                            <li>
+                                <strong style="color: #fff; display: block;"><i class="bi bi-geo-alt"></i> Location & Mobility</strong>
+                                Greater Minneapolis-St. Paul Area (Open to local, hybrid, or fully remote engineering tracks).
+                            </li>
+                            <li>
+                                <strong style="color: #fff; display: block;"><i class="bi bi-briefcase"></i> Targeted Roles</strong>
+                                Senior Data Analyst, Full-Stack Python/Django Engineer, Business Intelligence Engineer.
+                            </li>
+                            <li>
+                                <strong style="color: #fff; display: block;"><i class="bi bi-clock"></i> Current Availability</strong>
+                                 Responding to verification and architecture inquiries within 12-24 hours.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-4 pt-3" style="border-top: 1px solid #1a1a1a;">
+                        <a href="{% static 'personal_site/resume/Kevin_Heysse_Resume_04292026.pdf' %}"  download class="btn btn-sm w-100 py-2" style="background-color: #00e5cc; color: #111; font-weight: bold; border: 1px solid #00e5cc; transition: all 0.2s;">
+                            Download Professional Resume (PDF) ↓
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function copyEmailToClipboard() {
+        const emailText = document.getElementById('emailText').innerText;
+        const copyBtn = document.getElementById('copyBtn');
+        
+        navigator.clipboard.writeText(emailText).then(() => {
+            copyBtn.innerText = 'Copied!';
+            copyBtn.style.background = 'rgba(0,229,204,0.1)';
+            
+            setTimeout(() => {
+                copyBtn.innerText = 'Copy';
+                copyBtn.style.background = 'transparent';
+            }, 2000);
+        });
+    }
+</script>
+{% endblock %}

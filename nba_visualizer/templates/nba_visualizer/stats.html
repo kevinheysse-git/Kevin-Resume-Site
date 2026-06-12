@@ -1,0 +1,444 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ player.full_name }} Stats | Kevin Heysse{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+
+        <a href="{% url 'nba_visualizer:player_search' %}"
+            style="color: #00e5cc; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+            ← Back to search
+        </a>
+
+        <h1 class="mt-3 mb-1 fw-bold" style="color: white;">{{ player.full_name }}</h1>
+        <p style="color: #aaa; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;">
+            2025-26 NBA Season <span id="dynamicSubtitleAction">— click any point on the chart to view that game's shot chart</span>
+        </p>
+
+        <div class="d-flex gap-2 mb-4 flex-wrap" style="font-family: 'JetBrains Mono', monospace;">
+            <button onclick="switchStatTab('PTS', this)" class="stat-tab-btn {% if initial_stat == 'PTS' %}active-tab{% endif %}" style="background: #111; color: #888; border: 1px solid #2a2a2a; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.875rem;">PTS</button>
+            <button onclick="switchStatTab('AST', this)" class="stat-tab-btn {% if initial_stat == 'AST' %}active-tab{% endif %}" style="background: #111; color: #888; border: 1px solid #2a2a2a; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.875rem;">AST</button>
+            <button onclick="switchStatTab('REB', this)" class="stat-tab-btn {% if initial_stat == 'REB' %}active-tab{% endif %}" style="background: #111; color: #888; border: 1px solid #2a2a2a; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.875rem;">REB</button>
+            <button onclick="switchStatTab('STL', this)" class="stat-tab-btn {% if initial_stat == 'STL' %}active-tab{% endif %}" style="background: #111; color: #888; border: 1px solid #2a2a2a; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.875rem;">STL</button>
+            <button onclick="switchStatTab('BLK', this)" class="stat-tab-btn {% if initial_stat == 'BLK' %}active-tab{% endif %}" style="background: #111; color: #888; border: 1px solid #2a2a2a; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.875rem;">BLK</button>
+        </div>
+
+        <style>
+            .active-tab { border-color: #00e5cc !important; color: #00e5cc !important; font-weight: bold; background: rgba(0,229,204,0.05) !important; }
+        </style>
+
+        <div class="row g-3 mb-4 text-center" style="font-family: 'JetBrains Mono', monospace;">
+            <div class="col-md-3">
+                <div class="p-3 rounded text-light" style="background-color: #1a1a1a; border: 1px solid #2a2a2a;">
+                    <small id="avgCardLabel" style="color: #666; font-size: 0.75rem; text-transform: uppercase;">PTS Season Avg</small>
+                    <h3 id="avgCardValue" class="mb-0 mt-1 fw-bold" style="color: #ffffff;">0.0</h3>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="p-3 rounded text-light" style="background-color: #1a1a1a; border: 1px solid #2a2a2a;">
+                    <small id="highCardLabel" style="color: #666; font-size: 0.75rem; text-transform: uppercase;">PTS Season High</small>
+                    <h3 id="highCardValue" class="mb-0 mt-1 fw-bold" style="color: #00e5cc;">0</h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="p-3 rounded text-light" style="background-color: #1a1a1a; border: 1px solid #2a2a2a;">
+                    <small id="lowCardLabel" style="color: #666; font-size: 0.75rem; text-transform: uppercase;">PTS Season Low</small>
+                    <h3 id="lowCardValue" class="mb-0 mt-1 fw-bold" style="color: #ff4d4d;">0</h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="p-3 rounded text-light text-start" style="background-color: #1a1a1a; border: 1px solid #2a2a2a; padding-bottom: 0.65rem !important;">
+                    <small style="color: #666; font-size: 0.75rem; text-transform: uppercase; display: block; text-align: center;" class="mb-1">Shooting Splits</small>
+                    <div class="d-flex justify-content-around text-center mt-1">
+                        <div>
+                            <span style="font-size: 0.7rem; color: #888; display: block;">FG%</span>
+                            <strong style="color: #fff; font-size: 1.1rem;">{{ season_fg_pct }}%</strong>
+                        </div>
+                        <div style="border-left: 1px solid #2a2a2a; height: 28px; margin-top: 4px;"></div>
+                        <div>
+                            <span style="font-size: 0.7rem; color: #888; display: block;">3P%</span>
+                            <strong style="color: #bb86fc; font-size: 1.1rem;">{{ season_3p_pct }}%</strong>
+                        </div>
+                        <div style="border-left: 1px solid #2a2a2a; height: 28px; margin-top: 4px;"></div>
+                        <div>
+                            <span style="font-size: 0.7rem; color: #888; display: block;">FT%</span>
+                            <strong style="color: #5ac8fa; font-size: 1.1rem;">{{ season_ft_pct }}%</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 rounded mb-4" style="background-color: #1a1a1a; border: 1px solid #2a2a2a;">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+                <div id="clickHintWrapper">
+                    <p style="color: #666; font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; margin: 0;">
+                        click a data point to open shot chart
+                    </p>
+                </div>
+                
+                <div class="d-flex gap-3" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">
+                    <div class="btn-group" style="border: 1px solid #333; border-radius: 6px; overflow: hidden;">
+                        <button onclick="filterChart('loc', 'All', this)" class="loc-btn active-filter" style="background: #222; color: #fff; border: none; padding: 4px 10px; cursor: pointer;">All</button>
+                        <button onclick="filterChart('loc', 'Home', this)" class="loc-btn" style="background: #111; color: #888; border: none; padding: 4px 10px; cursor: pointer;">Home</button>
+                        <button onclick="filterChart('loc', 'Away', this)" class="loc-btn" style="background: #111; color: #888; border: none; padding: 4px 10px; cursor: pointer;">Away</button>
+                    </div>
+
+                    <div class="btn-group" style="border: 1px solid #333; border-radius: 6px; overflow: hidden;">
+                        <button onclick="filterChart('outcome', 'All', this)" class="out-btn active-filter" style="background: #222; color: #fff; border: none; padding: 4px 10px; cursor: pointer;">All</button>
+                        <button onclick="filterChart('outcome', 'W', this)" class="out-btn" style="background: #111; color: #888; border: none; padding: 4px 10px; cursor: pointer;">Wins</button>
+                        <button onclick="filterChart('outcome', 'L', this)" class="out-btn" style="background: #111; color: #888; border: none; padding: 4px 10px; cursor: pointer;">Losses</button>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .active-filter { background: #00e5cc !important; color: #111 !important; font-weight: bold; }
+            </style>
+
+            <canvas id="statsChart"></canvas>
+        </div>
+
+    </div>
+</div>
+
+<div id="shotModal" style="
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;">
+
+    <div style="
+        background: #111; border: 1px solid #2a2a2a; border-radius: 12px;
+        padding: 24px; max-width: 580px; width: 95%; position: relative;">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h5 id="modalTitle" style="color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0;"></h5>
+                <small id="modalSubtitle" style="color: #00e5cc; font-family: 'JetBrains Mono', monospace; font-weight: bold;"></small>
+            </div>
+            <button onclick="closeModal()" style="
+                background: none; border: none; color: #aaa; font-size: 1.4rem;
+                cursor: pointer; line-height: 1;">×</button>
+        </div>
+
+        <div class="d-flex gap-3 mb-3 flex-wrap">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #aaa;">
+                <span style="color:#00e5cc;">●</span> Rim 
+                <span style="color:#5ac8fa;">●</span> Mid-Range 
+                <span style="color:#bb86fc;">●</span> 3PT 
+                <span class="ms-2" style="color:#ff4d4d; font-weight: bold;">○</span> Missed
+            </span>
+            <span id="modalStats" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #888; margin-left: auto;"></span>
+        </div>
+
+        <div id="zoneStats" style="
+            font-family:'JetBrains Mono', monospace;
+            font-size:0.75rem;
+            color:#888;
+            margin-bottom:12px;
+            display:flex;
+            gap:14px;
+            flex-wrap:wrap;">
+        </div>
+
+        <div id="shotLoading" class="text-center py-5">
+            <div class="spinner-border" style="color: #00e5cc;" role="status"></div>
+            <p style="color: #aaa; font-family: 'JetBrains Mono', monospace; margin-top: 12px; font-size: 0.85rem;">
+                Loading shot data...
+            </p>
+        </div>
+
+        <div style="position: relative; width: 100%;">
+            <svg id="courtSvg" viewBox="-250 -47.5 500 470"
+                xmlns="http://www.w3.org/2000/svg"
+                style="width: 100%; background: #0d0d0d; border-radius: 8px; border: 1px solid #2a2a2a; display: none;">
+                <rect x="-80" y="-47.5" width="160" height="190" fill="none" stroke="#444" stroke-width="2"/>
+                <circle cx="0" cy="142.5" r="60" fill="none" stroke="#444" stroke-width="2" stroke-dasharray="6,4"/>
+                <path d="M -40 -47.5 A 40 40 0 0 1 40 -47.5" fill="none" stroke="#444" stroke-width="2"/>
+                <circle cx="0" cy="0" r="7.5" fill="none" stroke="#666" stroke-width="2"/>
+                <line x1="-30" y1="-7.5" x2="30" y2="-7.5" stroke="#666" stroke-width="3"/>
+                <line x1="-220" y1="-47.5" x2="-220" y2="90" stroke="#444" stroke-width="2"/>
+                <line x1="220" y1="-47.5" x2="220" y2="90" stroke="#444" stroke-width="2"/>
+                <path d="M -220 90 A 237.5 237.5 0 0 0 220 90" fill="none" stroke="#444" stroke-width="2"/>
+                <line x1="-250" y1="418" x2="250" y2="418" stroke="#444" stroke-width="1"/>
+                <g id="shotsGroup"></g>
+            </svg>
+            <div id="shotTooltip" style="
+                position: absolute; display: none; pointer-events: none;
+                background: #111; border: 1px solid #2a2a2a; border-radius: 8px;
+                padding: 8px 10px; color: white; font-family: 'JetBrains Mono', monospace;
+                font-size: 0.75rem; z-index: 10000; box-shadow: 0 0 12px rgba(0,0,0,0.5);
+            "></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const allLabels    = {{ labels|safe }};
+    const allGameIds   = {{ game_ids|safe }};
+    const allMatchups  = {{ matchups|safe }};
+    const wlList       = {{ wl_list|safe }};
+    const locationList = {{ location_list|safe }};
+    const statsBundle  = {{ master_stats_bundle|safe }}; 
+    const playerId     = {{ player.id }};
+
+    let currentStat   = "{{ initial_stat }}";
+    let isPtsTab      = currentStat === "PTS";
+    let activeFilters = { loc: 'All', outcome: 'All' };
+
+    let labels   = [...allLabels];
+    let values   = [...statsBundle[currentStat].values];
+    let gameIds  = [...allGameIds];
+    let matchups = [...allMatchups];
+
+    function calculateMovingAverage(dataArr, windowSize = 5) {
+        return dataArr.map((_, idx, arr) => {
+            const start = Math.max(0, idx - windowSize + 1);
+            const subset = arr.slice(start, idx + 1);
+            const sum = subset.reduce((acc, v) => acc + v, 0);
+            return subset.length ? parseFloat((sum / subset.length).toFixed(1)) : 0;
+        });}
+
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: currentStat,
+                    data: values,
+                    borderColor: '#00e5cc',
+                    backgroundColor: 'rgba(0, 229, 204, 0.04)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#00e5cc',
+                    pointRadius: 4,
+                    pointHoverRadius: isPtsTab ? 7 : 4,
+                    tension: 0.2,
+                    fill: true,
+                    order: 1
+                },
+                {
+                    label: '5-Game Average',
+                    data: calculateMovingAverage(values),
+                    borderColor: 'rgba(255, 255, 255, 0.35)',
+                    borderWidth: 2,
+                    borderDash: [6, 4],
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    tension: 0.4,
+                    fill: false,
+                    order: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            onHover: (event, chartElement) => {
+                event.native.target.style.cursor = (isPtsTab && chartElement.length > 0) ? 'pointer' : 'default';
+            },
+            onClick: (event, elements) => {
+                if (isPtsTab && elements.length > 0) {
+                    const validElements = elements.filter(el => el.datasetIndex === 0);
+                    if (validElements.length === 0) return;
+
+                    const index = validElements[0].index;
+                    openShotChart(gameIds[index], labels[index], values[index], matchups[index]);
+
+                    chart.setActiveElements([{ datasetIndex: 0, index: index }]);
+                    chart.update(); 
+                }
+            },
+            plugins: {
+                legend: { labels: { color: '#aaa', font: { family: 'JetBrains Mono' } } },
+                tooltip: {
+                    backgroundColor: '#111',
+                    titleColor: '#00e5cc',
+                    bodyColor: '#fff',
+                    borderColor: '#2a2a2a',
+                    borderWidth: 1,
+                    titleFont: { family: 'JetBrains Mono' },
+                    bodyFont: { family: 'JetBrains Mono' },
+                    callbacks: {
+                        title: (tooltipItems) => {
+                            const index = tooltipItems[0].dataIndex;
+                            return `${labels[index]} ${matchups[index]}`;
+                        },
+                        label: (context) => {
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.parsed.y !== null) label += context.parsed.y;
+                            return label;
+                        },
+                        footer: () => isPtsTab ? 'Click to view shot chart' : null
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#666', font: { family: 'JetBrains Mono', size: 10 }, maxTicksLimit: 10 },
+                    grid: { color: '#2a2a2a' }
+                },
+                y: {
+                    ticks: { color: '#aaa', font: { family: 'JetBrains Mono' } },
+                    grid: { color: '#2a2a2a' }
+                }
+            }
+        }
+    });
+
+    function switchStatTab(selectedMetric, buttonEl) {
+        document.querySelectorAll('.stat-tab-btn').forEach(btn => btn.classList.remove('active-tab'));
+        buttonEl.classList.add('active-tab');
+
+        currentStat = selectedMetric;
+        isPtsTab = currentStat === "PTS";
+
+        if (isPtsTab) {
+            document.getElementById('dynamicSubtitleAction').textContent = "— click any point on the chart to view that game's shot chart";
+            document.getElementById('clickHintWrapper').style.visibility = "visible";
+        } else {
+            document.getElementById('dynamicSubtitleAction').textContent = "— game-by-game trend performance";
+            document.getElementById('clickHintWrapper').style.visibility = "hidden";
+        }
+
+        syncFilterArrays();
+    }
+
+    function syncFilterArrays() {
+        const masterSourceValues = statsBundle[currentStat].values;
+
+        labels = [];
+        values = [];
+        gameIds = [];
+        matchups = [];
+
+        let runningSum = 0;
+
+        for (let i = 0; i < allLabels.length; i++) {
+            const matchesLoc = activeFilters.loc === 'All' || locationList[i] === activeFilters.loc;
+            const matchesOut = activeFilters.outcome === 'All' || wlList[i] === activeFilters.outcome;
+
+            if (matchesLoc && matchesOut) {
+                labels.push(allLabels[i]);
+                values.push(masterSourceValues[i]);
+                gameIds.push(allGameIds[i]);
+                matchups.push(allMatchups[i]);
+                runningSum += masterSourceValues[i];
+            }
+        }
+
+        const dynamicAvg  = values.length ? (runningSum / values.length).toFixed(1) : "0.0";
+        const dynamicHigh = values.length ? Math.max(...values) : 0;
+        const dynamicLow  = values.length ? Math.min(...values) : 0;
+
+        document.getElementById('avgCardLabel').textContent  = `${currentStat} Season Avg`;
+        document.getElementById('highCardLabel').textContent = `${currentStat} Season High`;
+        document.getElementById('lowCardLabel').textContent  = `${currentStat} Season Low`;
+
+        document.getElementById('avgCardValue').textContent  = dynamicAvg;
+        document.getElementById('highCardValue').textContent = dynamicHigh;
+        document.getElementById('lowCardValue').textContent  = dynamicLow;
+
+        chart.data.labels = labels;
+        chart.data.datasets[0].label = currentStat;
+        chart.data.datasets[0].data = values;
+        chart.data.datasets[0].pointHoverRadius = isPtsTab ? 7 : 4;
+        chart.data.datasets[1].data = calculateMovingAverage(values);
+
+        chart.update(); 
+    }
+
+    function filterChart(filterType, filterValue, buttonEl) {
+        const btnClass = filterType === 'loc' ? '.loc-btn' : '.out-btn';
+        document.querySelectorAll(btnClass).forEach(btn => btn.classList.remove('active-filter'));
+        buttonEl.classList.add('active-filter');
+
+        activeFilters[filterType] = filterValue;
+        syncFilterArrays();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const initialButton = document.querySelector('.active-tab');
+        if (initialButton) switchStatTab(currentStat, initialButton);
+    });
+
+    function getShotZone(shot) {
+        const x = shot.LOC_X; const y = shot.LOC_Y; const dist = shot.SHOT_DISTANCE;
+        if (y <= 90 && Math.abs(x) >= 220) return '3PT';
+        if (dist >= 23.75) return '3PT';
+        if (dist < 5) return 'RIM';
+        return 'MID';
+    }
+
+    function openShotChart(gameId, date, statValue, gameMatchup) {
+        document.getElementById('modalTitle').textContent = `{{ player.full_name }} — ${date}`;
+        document.getElementById('modalSubtitle').textContent = `${gameMatchup} | PTS: ${statValue}`;
+        document.getElementById('modalStats').textContent = '';
+        document.getElementById('shotLoading').style.display = 'block';
+        document.getElementById('courtSvg').style.display = 'none';
+
+        const modal = document.getElementById('shotModal');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+
+        fetch(`/nba/player/${playerId}/shots/${gameId}/`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('shotLoading').innerHTML = `<p style="color:#ff4d4d; font-family:'JetBrains Mono',monospace;">Error loading shot data.</p>`;
+                    return;
+                }
+                renderShots(data.shots);
+                const made = data.shots.filter(s => s.SHOT_MADE_FLAG === 1).length;
+                const fgPct = data.shots.length ? Math.round((made / data.shots.length) * 100) : 0;
+                const threes = data.shots.filter(s => getShotZone(s) === '3PT');
+                const madeThrees = threes.filter(s => s.SHOT_MADE_FLAG === 1).length;
+                document.getElementById('modalStats').textContent = `${made}/${data.shots.length} FG (${fgPct}%) • ${madeThrees}/${threes.length} 3PT`;
+                document.getElementById('shotLoading').style.display = 'none';
+                document.getElementById('courtSvg').style.display = 'block';
+            });
+    }
+
+    function renderShots(shots) {
+        const group = document.getElementById('shotsGroup'); const tooltip = document.getElementById('shotTooltip'); const court = document.getElementById('courtSvg');
+        group.innerHTML = '';
+        const rim = shots.filter(s => getShotZone(s) === 'RIM'); const mid = shots.filter(s => getShotZone(s) === 'MID'); const three = shots.filter(s => getShotZone(s) === '3PT');
+        function pct(arr) {
+            if (!arr.length) return '0/0 (--%)';
+            const made = arr.filter(x => x.SHOT_MADE_FLAG === 1).length;
+            return `${made}/${arr.length} (${Math.round(made / arr.length * 100)}%)`;
+        }
+        document.getElementById('zoneStats').innerHTML = `<span>RIM: <strong style="color:#00e5cc">${pct(rim)}</strong></span><span>MID: <strong style="color:#5ac8fa">${pct(mid)}</strong></span><span>3PT: <strong style="color:#bb86fc">${pct(three)}</strong></span>`;
+        shots.forEach((shot, index) => {
+            const x = shot.LOC_X; const y = shot.LOC_Y; const made = shot.SHOT_MADE_FLAG === 1; const zone = getShotZone(shot);
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', x); circle.setAttribute('cy', y); circle.setAttribute('r', 5);
+            let zoneColor = '#5ac8fa'; if (zone === 'RIM') zoneColor = '#00e5cc'; if (zone === '3PT') zoneColor = '#bb86fc';
+            if (made) { circle.setAttribute('fill', zoneColor); circle.setAttribute('stroke', '#0d0d0d'); circle.setAttribute('stroke-width', '1'); } 
+            else { circle.setAttribute('fill', 'none'); circle.setAttribute('stroke', '#ff4d4d'); circle.setAttribute('stroke-width', '1.8'); }
+            circle.style.opacity = 0; setTimeout(() => { circle.style.transition = 'opacity 0.2s ease'; circle.style.opacity = 0.9; }, index * 15);
+            circle.addEventListener('mousemove', e => {
+                const rect = court.getBoundingClientRect(); tooltip.style.display = 'block';
+                tooltip.innerHTML = `<div style="color:${made ? '#00e5cc' : '#ff4d4d'}; font-weight:bold;">${made ? 'MADE' : 'MISSED'}</div><div>${shot.ACTION_TYPE}</div><div>${shot.SHOT_DISTANCE} ft (${zone})</div>`;
+                tooltip.style.left = `${e.clientX - rect.left + 15}px`; tooltip.style.top = `${e.clientY - rect.top - 10}px`;
+            });
+            circle.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+            group.appendChild(circle);
+        });
+    }
+
+    function closeModal() {
+        document.getElementById('shotModal').style.display = 'none'; document.body.style.overflow = '';
+        if (typeof chart !== 'undefined') { chart.setActiveElements([]); chart.update(); }
+    }
+    document.getElementById('shotModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+{% endblock %}
